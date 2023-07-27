@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #3377FF;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            background-color: #002E5D;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #FFFFFF;
+            font-size: 48px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+         h2 {
+            color: #FFFFFF;
+            font-size: 35px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #FFFFFF;
+            font-size: 18px;
+        }
+
+        input[type="number"] {
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: #FFFFFF;
+            border: none;
+            cursor: pointer;
+        }
+
+        p {
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+            color: #FFFFFF;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="font-size: 64px;">Nicu's Home</h1>
+        <h2>Thermostat Control</h2>
+        <form onsubmit="sendData(event)">
+            <label for="temperature">Set Thermostat Temperature:</label>
+            <input type="number" id="temperature" name="temperature">
+            <button type="submit">Set</button>
+        </form>
+        <p>Thermostat Temperature: <span id="thermostatTemp"></span></p>
+        <p>Home Temperature: {{ homeTemp }}</p>
+       <p>Air Conditioning: {% if ACState %}On{% else %}Off{% endif %}</p>
+       <p>Heating: {% if Heating %}On{% else %}Off{% endif %}</p>
+        <p>Door State: {% if doorSensor %}Door is Open{% else %}Door is Closed{% endif %}</p>
+        <p>Hall Light: {% if value %}On{% else %}Off{% endif %}</p>
+        <p>Gas Safety: {{ gasSafety }}</p>
+    </div>
+    <script>
+        function sendData(event) {
+            event.preventDefault();
+            const form = event.target;
+            const temperature = form.temperature.value;
+
+            // Create the data object to be sent to the API
+            const data = {
+                "Thermostat Temperature": temperature
+            };
+
+            // Send the data to the API using fetch
+            fetch('/', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(result => {
+                    console.log('Data sent successfully');
+                    // Update the thermostat temperature on the HTML page
+                    const thermostatTempElement = document.getElementById('thermostatTemp');
+                    thermostatTempElement.textContent = result['Thermostat Temperature'];
+                })
+                .catch(error => {
+                    console.error('Error sending data:', error);
+                });
+        }
+    </script>
+</body>
+</html>
